@@ -17,6 +17,15 @@ self-hostable and will be kept (mostly) open source (see "Getters" below).
 > to me directly if you have questions or need help, please don't bother the R—
 > team.
 
+```mermaid
+graph LR;
+    R[R—]-.->M[official metadata];
+    R-->rreading-glasses;
+
+    classDef dotted stroke-dasharray:2,text-decoration:line-through;
+    class M dotted;
+```
+
 ## Key differences
 
 Please read this section closely before deciding to use the service, especially
