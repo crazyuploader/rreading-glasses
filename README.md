@@ -9,7 +9,7 @@ your library, or to temporarily help you add works the R— service doesn't have
 yet.
 
 Unlike R—'s proprietary service, this is much faster, handles large authors,
-and doesn't take months to load new works. It is also intended to eventually be
+and doesn't take months to load new works. It is also intended to be
 self-hostable and will be kept (mostly) open source (see "Getters" below).
 
 > [!IMPORTANT]
@@ -77,6 +77,29 @@ added should be preserved.
 > Metadata is periodically refreshed and in some cases existing files may
 > become unmapped (see note above about subtitles). You can correct this from
 > `Library > Unmapped Files`, or do a `Manual Import` from an author's page.
+
+### Self-hosting
+
+An image is available at `docker.io/blampe/rreading-glasses`. It requires a
+Postgres backend, and its flags currently look like this:
+
+```
+Usage: rreading-glasses --upstream=STRING [flags]
+
+Flags:
+  -h, --help                                    Show context-sensitive help.
+      --port=8788
+      --rpm=60                                  maximum upstream requests per minute
+      --cookie=STRING                           cookie to use for upstream HTTP requests
+      --verbose                                 increase log verbosity
+      --postgres-host="localhost"
+      --postgres-user="postgres"
+      --postgres-password=""
+      --postgres-port=5432
+      --postgres-database="rreading-glasses"
+      --proxy=""                                HTTP proxy URL to use for upstream requests
+      --upstream=STRING                         upstream host (e.g. www.example.com)
+```
 
 ## Details
 
