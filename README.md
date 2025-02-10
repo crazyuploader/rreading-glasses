@@ -37,27 +37,6 @@ Here's what folks have said so far:
 
 > it worked! thanks my man, my wife will be happy with this
 
-## Key differences
-
-I have deviated slightly from the official service's behavior to make a couple
-of, in my opinion, quality of life improvements. These aren't due to technical
-limitations and can be changed, so I'm eager to hear if people think these are
-an improvement or if it would be better to match the official behavior more
-exactly.
-
-- Book titles no longer include subtitles (so `{Book Title}` behaves like
-  `{Book TitleNoSub}` by default). This de-clutters the UI, cleans up the
-  directory layout, and improves import matching but __you may need to
-  re-import some works with long subtitles__. I think the trade-off is worth it
-  but others might disagree — let me know!
-
-- The "best" (original) edition is always preferred to make cover art more
-  consistently high-quality. Additionally, books are no longer returned with
-  every edition ever released, because that makes manual edition selection
-  difficult to impossible. Instead, an alternative edition (e.g. translation)
-  is only included once at least one user has searched for it. (This might
-  change in the future to include all editions but de-duplicated by title.)
-
 ## Usage
 
 > [!CAUTION]
@@ -126,6 +105,27 @@ shouldn't exceed a few gigabytes for personal use. (The published image doesn't
 require any large data dumps and will gradually grow your database as it's
 queried over time.)
 
+## Key differences
+
+I have deviated slightly from the official service's behavior to make a couple
+of, in my opinion, quality of life improvements. These aren't due to technical
+limitations and can be changed, so I'm eager to hear if people think these are
+an improvement or if it would be better to match the official behavior more
+exactly.
+
+- Book titles no longer include subtitles (so `{Book Title}` behaves like
+  `{Book TitleNoSub}` by default). This de-clutters the UI, cleans up the
+  directory layout, and improves import matching but __you may need to
+  re-import some works with long subtitles__. I think the trade-off is worth it
+  but others might disagree — let me know!
+
+- The "best" (original) edition is always preferred to make cover art more
+  consistently high-quality. Additionally, books are no longer returned with
+  every edition ever released, because that makes manual edition selection
+  difficult to impossible. Instead, an alternative edition (e.g. translation)
+  is only included once at least one user has searched for it. (This might
+  change in the future to include all editions but de-duplicated by title.)
+
 ## Details
 
 This project implements an API-compatible, coalescing read-through cache for
@@ -158,7 +158,7 @@ closed-source (for now). A summary of their differences is below.
 | Large authors?    | Supported.                                                                                                                                  | Supported, but authors include only 20 (max) books by default for now. New books can be added by manually searching.                                                                                                            |
 | Source code       | Private.                                                                                                                                    | Public.                                                                                                                                                                                                                         |
 | Performance       | Very fast.                                                                                                                                  | Slower, limited to 1RPS.                                                                                                                                                                                                        |
-| Stability         | Stable. Nearly identical behavior to official R——.                                                                                          | Experimental. ID mappings likely to be incorrect. Series data likely to be incomplete.                                                                                                                                          |
+| Stability         | Stable. Nearly identical behavior to official R——.                                                                                          | Experimental and probably more appropriate for new libraries. ID mappings are likely to not exactly match with existing libraries. Series data likely to be incomplete.                                                         |
 | Hosted instance   | `http://api.bookinfo.pro`                                                                                                                   | Coming soon!                                                                                                                                                                                                                    |
 | Self-hosted image | `blampe/rreading-glasses:latest`                                                                                                            | `blampe/rreading-glasses:hardcover`                                                                                                                                                                                             |
 
