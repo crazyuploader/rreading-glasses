@@ -26,7 +26,8 @@ graph LR;
 > to me directly if you have questions or need help, please don't bother the R——
 > team.
 
-Here's what folks have said so far:
+As of March 2025 there are ~200 users of the shared instance. Here's what some
+of them have said so far:
 
 > Man this is wayyyyyy better than the inhouse metadata, thank you!!
 
@@ -77,14 +78,14 @@ added should be preserved.
 
 ![after](./.github/after.png)
 
-### Self-hosting
+## Self-hosting
 
 An image is available at
 [`blampe/rreading-glasses`](https://hub.docker.com/r/blampe/rreading-glasses).
 It requires a Postgres backend, and its flags currently look like this:
 
 ```
-Usage: rreading-glasses serve --upstream=STRING [flags]
+Usage: rreading-glasses serve --upstream=STRING --hardcover-auth=STRING [flags]
 
 Run an HTTP server.
 
@@ -102,17 +103,78 @@ Flags:
       --cookie=STRING                           Cookie to use for upstream HTTP requests.
       --proxy=""                                HTTP proxy URL to use for upstream requests.
       --upstream=STRING                         Upstream host (e.g. www.example.com).
+      --hardcover-auth=STRING                   Hardcover Authorization header, e.g. 'Bearer ...'
 ```
 
-A `docker-compose.yml` file is included as a reference. It's highly recommended
-that you include a cookie for better performance, otherwise new author lookups
-will be throttled to 1 per minute.
+
+Two docker compose example files are included as a reference:
+`docker-compose-gr.yml` and `docker-compose-hardcover.yml`.
+
+### G——R—— Cookie
+
+When using the G——R—— image ("latest" tag) it's highly recommended that you set
+the `cookie` flag for better performance, otherwise new author lookups will be
+throttled to 1 per minute. (These requests don't scrape metadata – they simply
+resolve canonical IDs. They are only needed the first time an author or book is
+fetched.)
+
+* Open a Private/Incognito window in your browser.
+* Go to G——R——.
+* Create an account or login to your existing account, checking the box to `Keep me signed in`.
+* Open Developer Tools (usually with `F12`) and go to the `Network` tab.
+* Refresh the page.
+* Right click on the first row of `g——r——.com`.
+* Select `Copy`/`Copy Value` > `Copy as cURL`.
+* Paste it into a plain text editor.
+
+```
+curl 'https://www.g——r——.com/'
+    ...
+    -H 'Cookie: <you want everything in here>'
+    ...
+```
+* Grab everything after `Cookie:` up to, but not including, the trailing `'`.
+* If the last character of the string is a semi-colon (`;`), remove this as well.
+* Use this as the `--cookie` flag.
+
+#### Example G——R—— Docker Compose Snippet
+
+> \- --cookie=ccsid=foo; ...; lc-main=en_US
+
+### Hardcover Auth
+
+When using Hardcover you must set the `hardcover-auth` parameter (this is optional with G——R——).
+
+* Create an account or login to [Hardcover](https://hardcover.app).
+* Click on User Icon and Settings.
+* Select `Hardcover API`.
+* Copy the entire token **including** `Bearer`.
+* Use this as the `--hardcover-auth` flag.
+
+#### Example Hardcover Docker Compose Snippet
+
+> \- --hardcover-auth=Bearer Q123AbC...
+
+### Resource Requirements
 
 Resource requirements are minimal; a Raspberry Pi should suffice. Storage
 requirements will vary depending on the size of your library, but in most cases
 shouldn't exceed a few gigabytes for personal use. (The published image doesn't
 require any large data dumps and will gradually grow your database as it's
 queried over time.)
+
+### Troubleshooting
+
+When in doubt, make sure you have the latest image pulled: `docker pull
+blampe/rreading-glasses:latest` or `blampe/rreading-glasses:hardcover`.
+
+If you suspect data inconsistencies, try removing R——'s `cache.db` file and
+then restart the app.
+
+You can also try deleting your Postgres database to ensure you don't have any
+bad data cached.
+
+If these steps don't resolve the problem, please create an issue!
 
 ## Key differences
 
@@ -160,16 +222,16 @@ There are currently two sources available: [Hardcover](https://hardcover.app)
 and G——R——. The former is implemented in this repo but the latter is
 closed-source (for now). A summary of their differences is below.
 
-|                   | G——R——                                                                                                                                      | Hardcover                                                                                                                                                                                                                       |
-| --                | --                                                                                                                                          | -------------                                                                                                                                                                                                                   |
-| Summary           | A faster but closed-source provider which makes all of G——R—— available, including large authors and books not available by default in R——. | A slower but open-source provider which makes _most_ of Hardcover's library available, as long as their metadata includes a G——R—— ID. This is a smaller data set, but it might be preferable due to having fewer "junk" books. |
-| New releases?     | Supported.                                                                                                                                  | Supported.                                                                                                                                                                                                                      |
-| Large authors?    | Supported.                                                                                                                                  | Supported, but authors include only 20 (max) books by default for now. New books can be added by manually searching.                                                                                                            |
-| Source code       | Private.                                                                                                                                    | Public.                                                                                                                                                                                                                         |
-| Performance       | Very fast.                                                                                                                                  | Slower, limited to 1RPS.                                                                                                                                                                                                        |
-| Stability         | Stable. Nearly identical behavior to official R——.                                                                                          | Experimental and probably more appropriate for new libraries. ID mappings are likely to not exactly match with existing libraries. Series data likely to be incomplete.                                                         |
-| Hosted instance   | `https://api.bookinfo.pro`                                                                                                                  | Coming soon!                                                                                                                                                                                                                    |
-| Self-hosted image | `blampe/rreading-glasses:latest`                                                                                                            | `blampe/rreading-glasses:hardcover`                                                                                                                                                                                             |
+| | G——R—— | Hardcover |
+| -- | -- | ------------- |
+| Summary | A faster but closed-source provider which makes all of G——R—— available, including large authors and books not available by default in R——. | A slower but open-source provider which makes _most_ of Hardcover's library available, as long as their metadata includes a G——R—— ID. This is a smaller data set, but it might be preferable due to having fewer "junk" books. |
+| New releases? | Supported | Supported |
+| Large authors? | Supported | Supported, but authors include only 20 (max) books by default for now. New books can be added by manually searching. |
+| Source code | Private | Public |
+| Performance | Very fast | Slower, limited to 1RPS |
+| Stability | Stable. Nearly identical behavior to official R—— | Experimental and probably more appropriate for new libraries. ID mappings are likely to not exactly match with existing libraries. Series data likely to be incomplete |
+| Hosted instance | `https://api.bookinfo.pro` | Coming soon! |
+| Self-hosted image | `blampe/rreading-glasses:latest` | `blampe/rreading-glasses:hardcover` |
 
 Please consider [supporting](https://hardcover.app/pricing) Hardcover if you
 use them as your source. It's $5/month and the work they are doing to break
