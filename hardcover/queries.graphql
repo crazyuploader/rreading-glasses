@@ -7,6 +7,7 @@ query GetBook($grBookID: String!) {
     edition {
       id
       title
+      subtitle
       asin
       isbn_13
       edition_format
@@ -26,6 +27,7 @@ query GetBook($grBookID: String!) {
     book {
       id
       title
+      subtitle
       description
       release_date
       cached_tags(path: "$.Genre")
@@ -38,7 +40,6 @@ query GetBook($grBookID: String!) {
           name
           slug
           bio
-          identifiers
           cached_image(path: "url")
         }
       }
@@ -51,6 +52,9 @@ query GetBook($grBookID: String!) {
           description
           identifiers
         }
+      }
+      book_mappings {
+        dto_external
       }
       rating
       ratings_count
