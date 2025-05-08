@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -15,21 +15,23 @@ import (
 	memory "github.com/eko/gocache/store/ristretto/v4"
 )
 
-// layeredcache implements a simple tiered cache. In practice we use an
+// LayeredCache implements a simple tiered cache. In practice we use an
 // in-memory cache backed by Postgres for persistent storage. Hits at lower
 // layers are automatically percolated up. Values are compressed with gzip at
 // rest.
 //
 // cache.ChainCache has inconsistent marshaling behavior, so we use our own
 // wrapper. Actually that package doesn't really buy us anything...
-type layeredcache struct {
+type LayeredCache struct {
 	hits   atomic.Int64
 	misses atomic.Int64
 
 	wrapped []cache.SetterCacheInterface[[]byte]
 }
 
-func (c *layeredcache) GetWithTTL(ctx context.Context, key string) ([]byte, time.Duration, bool) {
+// GetWithTTL returns the cached value and its TTL. The boolean returned is
+// false if no value was found.
+func (c *LayeredCache) GetWithTTL(ctx context.Context, key string) ([]byte, time.Duration, bool) {
 	var val []byte
 	var ttl time.Duration
 	var err error
@@ -44,7 +46,7 @@ func (c *layeredcache) GetWithTTL(ctx context.Context, key string) ([]byte, time
 				}
 				err = cc.Set(ctx, key, val, store.WithExpiration(ttl), store.WithSynchronousSet())
 				if err != nil {
-					log(ctx).Warn("problem caching", "key", key, "layer", idx)
+					Log(ctx).Warn("problem caching", "key", key, "layer", idx)
 				}
 			}(cc)
 			continue
@@ -60,12 +62,14 @@ func (c *layeredcache) GetWithTTL(ctx context.Context, key string) ([]byte, time
 	return nil, 0, false
 }
 
-func (c *layeredcache) Get(ctx context.Context, key string) ([]byte, bool) {
+// Get returns a cache value, if it exists, and a boolean if a value was found.
+func (c *LayeredCache) Get(ctx context.Context, key string) ([]byte, bool) {
 	val, _, ok := c.GetWithTTL(ctx, key)
 	return val, ok
 }
 
-func (c *layeredcache) Delete(ctx context.Context, key string) error {
+// Delete removes a key from all layers of the cache.
+func (c *LayeredCache) Delete(ctx context.Context, key string) error {
 	var err error
 	for _, cc := range c.wrapped {
 		err = errors.Join(cc.Delete(ctx, key))
@@ -73,14 +77,15 @@ func (c *layeredcache) Delete(ctx context.Context, key string) error {
 	return err
 }
 
-// TODO: Fuzz expiration?
-func (c *layeredcache) Set(ctx context.Context, key string, val []byte, ttl time.Duration) {
+// Set a key/value in all layers of the cache.
+// TODO: Fuzz expiration
+func (c *LayeredCache) Set(ctx context.Context, key string, val []byte, ttl time.Duration) {
 	if len(val) == 0 {
-		log(ctx).Warn("refusing to set empty value", "key", key)
+		Log(ctx).Warn("refusing to set empty value", "key", key)
 		return
 	}
 	if ttl == 0 {
-		log(ctx).Warn("refusing to set zero ttl", "key", key)
+		Log(ctx).Warn("refusing to set zero ttl", "key", key)
 		return
 	}
 
@@ -89,25 +94,26 @@ func (c *layeredcache) Set(ctx context.Context, key string, val []byte, ttl time
 	for idx, cc := range c.wrapped {
 		err := cc.Set(ctx, key, val, store.WithExpiration(ttl), store.WithSynchronousSet())
 		if err != nil {
-			log(ctx).Warn("problem setting cache", "err", err, "layer", idx)
+			Log(ctx).Warn("problem setting cache", "err", err, "layer", idx)
 		}
 	}
 }
 
-func newCache(ctx context.Context, dsn string) (*layeredcache, error) {
+// NewCache constructs a new layered cache.
+func NewCache(ctx context.Context, dsn string) (*LayeredCache, error) {
 	m := newMemory()
 	pg, err := newPostgres(ctx, dsn)
 	if err != nil {
 		return nil, err
 	}
-	c := &layeredcache{wrapped: []cache.SetterCacheInterface[[]byte]{m, pg}}
+	c := &LayeredCache{wrapped: []cache.SetterCacheInterface[[]byte]{m, pg}}
 
 	// Log cache stats every minute.
 	go func() {
 		for {
 			time.Sleep(1 * time.Minute)
 			hits, misses := c.hits.Load(), c.misses.Load()
-			log(ctx).LogAttrs(ctx, slog.LevelDebug, "cache stats",
+			Log(ctx).LogAttrs(ctx, slog.LevelDebug, "cache stats",
 				slog.Int64("hits", hits),
 				slog.Int64("misses", misses),
 				slog.Float64("ratio", float64(hits)/(float64(hits)+float64(misses))),
@@ -132,14 +138,17 @@ func newMemory() *cache.Cache[[]byte] {
 	return cache.New[[]byte](store)
 }
 
-func workKey(workID int64) string {
+// WorkKey returns a cache key for a work ID.
+func WorkKey(workID int64) string {
 	return fmt.Sprintf("w%d", workID)
 }
 
-func bookKey(bookID int64) string {
+// BookKey returns a cache key for a book (edition) ID.
+func BookKey(bookID int64) string {
 	return fmt.Sprintf("b%d", bookID)
 }
 
-func authorKey(authorID int64) string {
+// AuthorKey returns a cache key for an author ID.
+func AuthorKey(authorID int64) string {
 	return fmt.Sprintf("a%d", authorID)
 }
