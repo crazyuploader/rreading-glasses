@@ -42,6 +42,9 @@ func groupEdges(edges chan edge, wait time.Duration) iter.Seq[edge] {
 				if !yield(edge) {
 					return
 				}
+				// Wait until we see the next edge, then start over.
+				edge = <-edges
+				continue
 			}
 
 			// If the next edge is for the same parent and kind, then aggregate
