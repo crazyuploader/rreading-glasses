@@ -14,121 +14,139 @@ import (
 //
 // columns and relationships of "authors"
 type GetAuthorAuthors_by_pkAuthors struct {
-	Location string `json:"location"`
-	Slug     string `json:"slug"`
+	Id           int64           `json:"id"`
+	Name         string          `json:"name"`
+	Slug         string          `json:"slug"`
+	Bio          string          `json:"bio"`
+	Cached_image json.RawMessage `json:"cached_image"`
 }
 
-// GetLocation returns GetAuthorAuthors_by_pkAuthors.Location, and is useful for accessing the field via an interface.
-func (v *GetAuthorAuthors_by_pkAuthors) GetLocation() string { return v.Location }
+// GetId returns GetAuthorAuthors_by_pkAuthors.Id, and is useful for accessing the field via an interface.
+func (v *GetAuthorAuthors_by_pkAuthors) GetId() int64 { return v.Id }
+
+// GetName returns GetAuthorAuthors_by_pkAuthors.Name, and is useful for accessing the field via an interface.
+func (v *GetAuthorAuthors_by_pkAuthors) GetName() string { return v.Name }
 
 // GetSlug returns GetAuthorAuthors_by_pkAuthors.Slug, and is useful for accessing the field via an interface.
 func (v *GetAuthorAuthors_by_pkAuthors) GetSlug() string { return v.Slug }
 
-// GetAuthorEditionsAuthors includes the requested fields of the GraphQL type authors.
+// GetBio returns GetAuthorAuthors_by_pkAuthors.Bio, and is useful for accessing the field via an interface.
+func (v *GetAuthorAuthors_by_pkAuthors) GetBio() string { return v.Bio }
+
+// GetCached_image returns GetAuthorAuthors_by_pkAuthors.Cached_image, and is useful for accessing the field via an interface.
+func (v *GetAuthorAuthors_by_pkAuthors) GetCached_image() json.RawMessage { return v.Cached_image }
+
+// GetAuthorEditionsAuthors_by_pkAuthors includes the requested fields of the GraphQL type authors.
 // The GraphQL type's documentation follows.
 //
 // columns and relationships of "authors"
-type GetAuthorEditionsAuthors struct {
+type GetAuthorEditionsAuthors_by_pkAuthors struct {
 	Location string `json:"location"`
 	Id       int64  `json:"id"`
 	Slug     string `json:"slug"`
 	// An array relationship
-	Contributions []GetAuthorEditionsAuthorsContributions `json:"contributions"`
-	Identifiers   json.RawMessage                         `json:"identifiers"`
+	Contributions []GetAuthorEditionsAuthors_by_pkAuthorsContributions `json:"contributions"`
+	Identifiers   json.RawMessage                                      `json:"identifiers"`
 }
 
-// GetLocation returns GetAuthorEditionsAuthors.Location, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthors) GetLocation() string { return v.Location }
+// GetLocation returns GetAuthorEditionsAuthors_by_pkAuthors.Location, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthors) GetLocation() string { return v.Location }
 
-// GetId returns GetAuthorEditionsAuthors.Id, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthors) GetId() int64 { return v.Id }
+// GetId returns GetAuthorEditionsAuthors_by_pkAuthors.Id, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthors) GetId() int64 { return v.Id }
 
-// GetSlug returns GetAuthorEditionsAuthors.Slug, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthors) GetSlug() string { return v.Slug }
+// GetSlug returns GetAuthorEditionsAuthors_by_pkAuthors.Slug, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthors) GetSlug() string { return v.Slug }
 
-// GetContributions returns GetAuthorEditionsAuthors.Contributions, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthors) GetContributions() []GetAuthorEditionsAuthorsContributions {
+// GetContributions returns GetAuthorEditionsAuthors_by_pkAuthors.Contributions, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthors) GetContributions() []GetAuthorEditionsAuthors_by_pkAuthorsContributions {
 	return v.Contributions
 }
 
-// GetIdentifiers returns GetAuthorEditionsAuthors.Identifiers, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthors) GetIdentifiers() json.RawMessage { return v.Identifiers }
+// GetIdentifiers returns GetAuthorEditionsAuthors_by_pkAuthors.Identifiers, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthors) GetIdentifiers() json.RawMessage {
+	return v.Identifiers
+}
 
-// GetAuthorEditionsAuthorsContributions includes the requested fields of the GraphQL type contributions.
+// GetAuthorEditionsAuthors_by_pkAuthorsContributions includes the requested fields of the GraphQL type contributions.
 // The GraphQL type's documentation follows.
 //
 // columns and relationships of "contributions"
-type GetAuthorEditionsAuthorsContributions struct {
+type GetAuthorEditionsAuthors_by_pkAuthorsContributions struct {
 	// An object relationship
-	Book GetAuthorEditionsAuthorsContributionsBookBooks `json:"book"`
+	Book GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks `json:"book"`
 }
 
-// GetBook returns GetAuthorEditionsAuthorsContributions.Book, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthorsContributions) GetBook() GetAuthorEditionsAuthorsContributionsBookBooks {
+// GetBook returns GetAuthorEditionsAuthors_by_pkAuthorsContributions.Book, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthorsContributions) GetBook() GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks {
 	return v.Book
 }
 
-// GetAuthorEditionsAuthorsContributionsBookBooks includes the requested fields of the GraphQL type books.
+// GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks includes the requested fields of the GraphQL type books.
 // The GraphQL type's documentation follows.
 //
 // columns and relationships of "books"
-type GetAuthorEditionsAuthorsContributionsBookBooks struct {
+type GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks struct {
 	Id            int64  `json:"id"`
 	Title         string `json:"title"`
 	Ratings_count int64  `json:"ratings_count"`
 	// An array relationship
-	Book_mappings []GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings `json:"book_mappings"`
+	Book_mappings []GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings `json:"book_mappings"`
 }
 
-// GetId returns GetAuthorEditionsAuthorsContributionsBookBooks.Id, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthorsContributionsBookBooks) GetId() int64 { return v.Id }
+// GetId returns GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks.Id, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks) GetId() int64 { return v.Id }
 
-// GetTitle returns GetAuthorEditionsAuthorsContributionsBookBooks.Title, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthorsContributionsBookBooks) GetTitle() string { return v.Title }
+// GetTitle returns GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks.Title, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks) GetTitle() string {
+	return v.Title
+}
 
-// GetRatings_count returns GetAuthorEditionsAuthorsContributionsBookBooks.Ratings_count, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthorsContributionsBookBooks) GetRatings_count() int64 {
+// GetRatings_count returns GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks.Ratings_count, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks) GetRatings_count() int64 {
 	return v.Ratings_count
 }
 
-// GetBook_mappings returns GetAuthorEditionsAuthorsContributionsBookBooks.Book_mappings, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthorsContributionsBookBooks) GetBook_mappings() []GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings {
+// GetBook_mappings returns GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks.Book_mappings, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks) GetBook_mappings() []GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings {
 	return v.Book_mappings
 }
 
-// GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings includes the requested fields of the GraphQL type book_mappings.
+// GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings includes the requested fields of the GraphQL type book_mappings.
 // The GraphQL type's documentation follows.
 //
 // columns and relationships of "book_mappings"
-type GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings struct {
+type GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings struct {
 	Book_id     int64  `json:"book_id"`
 	Edition_id  int64  `json:"edition_id"`
 	External_id string `json:"external_id"`
 }
 
-// GetBook_id returns GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings.Book_id, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings) GetBook_id() int64 {
+// GetBook_id returns GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings.Book_id, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings) GetBook_id() int64 {
 	return v.Book_id
 }
 
-// GetEdition_id returns GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings.Edition_id, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings) GetEdition_id() int64 {
+// GetEdition_id returns GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings.Edition_id, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings) GetEdition_id() int64 {
 	return v.Edition_id
 }
 
-// GetExternal_id returns GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings.External_id, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings) GetExternal_id() string {
+// GetExternal_id returns GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings.External_id, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings) GetExternal_id() string {
 	return v.External_id
 }
 
 // GetAuthorEditionsResponse is returned by GetAuthorEditions on success.
 type GetAuthorEditionsResponse struct {
-	// fetch data from the table: "authors"
-	Authors []GetAuthorEditionsAuthors `json:"authors"`
+	// fetch data from the table: "authors" using primary key columns
+	Authors_by_pk GetAuthorEditionsAuthors_by_pkAuthors `json:"authors_by_pk"`
 }
 
-// GetAuthors returns GetAuthorEditionsResponse.Authors, and is useful for accessing the field via an interface.
-func (v *GetAuthorEditionsResponse) GetAuthors() []GetAuthorEditionsAuthors { return v.Authors }
+// GetAuthors_by_pk returns GetAuthorEditionsResponse.Authors_by_pk, and is useful for accessing the field via an interface.
+func (v *GetAuthorEditionsResponse) GetAuthors_by_pk() GetAuthorEditionsAuthors_by_pkAuthors {
+	return v.Authors_by_pk
+}
 
 // GetAuthorResponse is returned by GetAuthor on success.
 type GetAuthorResponse struct {
@@ -477,8 +495,11 @@ func (v *__GetBookInput) GetGrBookID() string { return v.GrBookID }
 const GetAuthor_Operation = `
 query GetAuthor ($id: Int!) {
 	authors_by_pk(id: $id) {
-		location
+		id
+		name
 		slug
+		bio
+		cached_image(path: "url")
 	}
 }
 `
@@ -512,7 +533,7 @@ func GetAuthor(
 // The query or mutation executed by GetAuthorEditions.
 const GetAuthorEditions_Operation = `
 query GetAuthorEditions ($id: Int!, $limit: Int!, $offset: Int!) {
-	authors(limit: 1, where: {id:{_eq:$id}}) {
+	authors_by_pk(id: $id) {
 		location
 		id
 		slug

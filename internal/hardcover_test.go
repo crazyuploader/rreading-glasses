@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -37,7 +38,7 @@ func TestGetBookDataIntegrity(t *testing.T) {
 
 	ctx := context.Background()
 	c := gomock.NewController(t)
-	upstream := hardcover.NewMocktransport(c)
+	// upstream := hardcover.NewMocktransport(c)
 
 	gql := hardcover.NewMockgql(c)
 	gql.EXPECT().MakeRequest(gomock.Any(),
@@ -200,22 +201,20 @@ func TestGetBookDataIntegrity(t *testing.T) {
 				if !ok {
 					panic(gaw)
 				}
-				gaw.Authors = []hardcover.GetAuthorEditionsAuthors{
-					{
-						Id:   97020,
-						Slug: "sharon-m-draper",
-						Contributions: []hardcover.GetAuthorEditionsAuthorsContributions{
-							{
-								Book: hardcover.GetAuthorEditionsAuthorsContributionsBookBooks{
-									Id:            141397,
-									Title:         "Out of My Mind",
-									Ratings_count: 63,
-									Book_mappings: []hardcover.GetAuthorEditionsAuthorsContributionsBookBooksBook_mappings{
-										{
-											Book_id:     141397,
-											Edition_id:  30405274,
-											External_id: "6609765",
-										},
+				gaw.Authors_by_pk = hardcover.GetAuthorEditionsAuthors_by_pkAuthors{
+					Id:   97020,
+					Slug: "sharon-m-draper",
+					Contributions: []hardcover.GetAuthorEditionsAuthors_by_pkAuthorsContributions{
+						{
+							Book: hardcover.GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooks{
+								Id:            141397,
+								Title:         "Out of My Mind",
+								Ratings_count: 63,
+								Book_mappings: []hardcover.GetAuthorEditionsAuthors_by_pkAuthorsContributionsBookBooksBook_mappings{
+									{
+										Book_id:     141397,
+										Edition_id:  30405274,
+										External_id: "6609765",
 									},
 								},
 							},
@@ -227,7 +226,7 @@ func TestGetBookDataIntegrity(t *testing.T) {
 		}).AnyTimes()
 
 	cache := &LayeredCache{wrapped: []cache.SetterCacheInterface[[]byte]{newMemory()}}
-	getter, err := NewHardcoverGetter(cache, gql, &http.Client{Transport: upstream})
+	getter, err := NewHardcoverGetter(cache, gql, nil)
 	require.NoError(t, err)
 
 	ctrl, err := NewController(cache, getter)
@@ -281,5 +280,49 @@ func TestGetBookDataIntegrity(t *testing.T) {
 
 		require.Len(t, work.Books, 1)
 		assert.Equal(t, int64(6609765), work.Books[0].ForeignID)
+	})
+}
+
+func TestGetAuthor(t *testing.T) {
+	apiKey := os.Getenv("HARDCOVER_API_KEY")
+	if apiKey == "" {
+		t.Skip("missing HARDCOVER_API_KEY")
+		return
+	}
+	transport := ScopedTransport{
+		Host: "api.hardcover.app",
+		RoundTripper: &HeaderTransport{
+			Key:          "Authorization",
+			Value:        apiKey,
+			RoundTripper: http.DefaultTransport,
+		},
+	}
+
+	client := &http.Client{Transport: transport}
+
+	mapper, err := NewHCMapper(http.DefaultClient)
+	require.NoError(t, err)
+
+	cache := &LayeredCache{wrapped: []cache.SetterCacheInterface[[]byte]{newMemory()}}
+
+	gql, err := NewBatchedGraphQLClient("https://api.hardcover.app/v1/graphql", client, time.Second)
+	require.NoError(t, err)
+
+	getter, err := NewHardcoverGetter(cache, gql, mapper)
+	require.NoError(t, err)
+
+	ctrl, err := NewController(cache, getter)
+	require.NoError(t, err)
+	go ctrl.Run(t.Context(), 0)
+
+	t.Run("GetAuthor", func(t *testing.T) {
+		authorBytes, err := ctrl.GetAuthor(t.Context(), 4178)
+		require.NoError(t, err)
+
+		var author AuthorResource
+		err = json.Unmarshal(authorBytes, &author)
+		require.NoError(t, err)
+
+		assert.Greater(t, len(author.Works), 0)
 	})
 }

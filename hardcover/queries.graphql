@@ -64,13 +64,16 @@ query GetBook($grBookID: String!) {
 
 query GetAuthor($id: Int!) {
   authors_by_pk(id: $id) {
-    location
-    slug
+      id
+      name
+      slug
+      bio
+      cached_image(path: "url")
   }
 }
 
 query GetAuthorEditions($id: Int!, $limit: Int!, $offset: Int!) {
-  authors(limit: 1, where: { id: { _eq: $id } }) {
+  authors_by_pk(id: $id) {
     location
     id
     slug

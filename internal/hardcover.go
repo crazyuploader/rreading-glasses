@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"iter"
-	"net/http"
 	"strings"
 
 	"github.com/Khan/genqlient/graphql"
@@ -16,16 +15,16 @@ import (
 // attempts to minimize upstread HEAD requests (to resolve book/work IDs) by
 // relying on HC's raw external data.
 type HCGetter struct {
-	cache    *LayeredCache
-	gql      graphql.Client
-	upstream *http.Client
+	cache  *LayeredCache
+	gql    graphql.Client
+	mapper mapper
 }
 
 var _ getter = (*HCGetter)(nil)
 
 // NewHardcoverGetter returns a new Getter backed by Hardcover.
-func NewHardcoverGetter(cache *LayeredCache, gql graphql.Client, upstream *http.Client) (*HCGetter, error) {
-	return &HCGetter{cache: cache, gql: gql, upstream: upstream}, nil
+func NewHardcoverGetter(cache *LayeredCache, gql graphql.Client, mapper mapper) (*HCGetter, error) {
+	return &HCGetter{cache: cache, gql: gql, mapper: mapper}, nil
 }
 
 // GetWork returns the canonical edition for a book. Hardcover's GR mappings
@@ -55,12 +54,12 @@ func (g *HCGetter) GetWork(ctx context.Context, grWorkID int64) ([]byte, int64, 
 			return out, authorID, err
 		}
 	}
+
 	Log(ctx).Debug("getting work", "grWorkID", grWorkID)
 
-	// Sniff GR to resolve the work ID.
-	bookID, err := g.resolveRedirect(ctx, fmt.Sprintf("/work/%d", grWorkID))
+	bookID, err := g.mapper.MapWork(ctx, g, grWorkID)
 	if err != nil {
-		return nil, 0, fmt.Errorf("problem getting HEAD: %w", err)
+		return nil, 0, err
 	}
 
 	workBytes, _, authorID, err := g.GetBook(ctx, bookID)
@@ -214,15 +213,6 @@ func (g *HCGetter) GetBook(ctx context.Context, grBookID int64) ([]byte, int64, 
 		Series:      series, // TODO:: Doesn't fully work yet #17.
 	}
 
-	// If we haven't already cached this author do so now, because we don't
-	// normally have a way to lookup GR Author ID -> HC Author. This will get
-	// incrementally filled in by denormalizeWorks.
-	if _, ok := g.cache.Get(ctx, AuthorKey(grAuthorID)); !ok {
-		authorBytes, _ := json.Marshal(authorRsc)
-		g.cache.Set(ctx, AuthorKey(grAuthorID), authorBytes, _authorTTL)
-		// Don't use 2x TTL so the next fetch triggers a refresh
-	}
-
 	workTitle := bm.Book.Title
 	workFullTitle := workTitle
 	workSubtitle := bm.Book.Subtitle
@@ -233,6 +223,7 @@ func (g *HCGetter) GetBook(ctx context.Context, grBookID int64) ([]byte, int64, 
 	}
 
 	workRsc := workResource{
+		KCA:          fmt.Sprint(rune(bm.Book.Id)),
 		Title:        workTitle,
 		FullTitle:    workFullTitle,
 		ShortTitle:   workTitle,
@@ -289,12 +280,7 @@ func (g *HCGetter) GetAuthorBooks(ctx context.Context, authorID int64) iter.Seq[
 				return
 			}
 
-			if len(gae.Authors) == 0 {
-				Log(ctx).Warn("expected an author but got none", "authorID", authorID)
-				return
-			}
-
-			hcAuthor := gae.Authors[0]
+			hcAuthor := gae.Authors_by_pk
 			for _, c := range hcAuthor.Contributions {
 				if len(c.Book.Book_mappings) == 0 {
 					Log(ctx).Debug("no mappings found")
@@ -331,39 +317,73 @@ func (g *HCGetter) GetAuthorBooks(ctx context.Context, authorID int64) iter.Seq[
 // author IDs, so we only become aware of the HC ID once one of the author's
 // books is queried in GetBook.
 func (g *HCGetter) GetAuthor(ctx context.Context, grAuthorID int64) ([]byte, error) {
+	var hcAuthorID string
+
 	authorBytes, ok := g.cache.Get(ctx, AuthorKey(grAuthorID))
 
-	if !ok {
-		// We don't yet have a HC author ID, so give up.
-		return nil, errNotFound
+	if ok {
+		var author AuthorResource
+		_ = json.Unmarshal(authorBytes, &author)
+		hcAuthorID = author.KCA
+		if hcAuthorID != "" {
+			Log(ctx).Debug("found cached author", "hcAuthorID", hcAuthorID, "authorID", grAuthorID)
+		}
 	}
 
-	// Nothing else to load for now -- works will be attached asynchronously by
-	// the controller.
-	return authorBytes, nil
-}
+	if hcAuthorID == "" {
+		var err error
+		hcAuthorID, err = g.mapper.MapAuthor(ctx, g, grAuthorID)
+		if err != nil {
+			Log(ctx).Warn("problem seeding author", "err", err, "grAuthorID", grAuthorID)
+			return nil, err
+		}
+	}
 
-// resolveRedirect performs a HEAD request against the given URL, which is
-// expected to return a redirect. An ID is extracted from the location header
-// and returned. For example this allows resolving a canonical book ID by
-// sniffing /work/{id}.
-func (g *HCGetter) resolveRedirect(ctx context.Context, url string) (int64, error) {
-	head, _ := http.NewRequestWithContext(ctx, "HEAD", url, nil)
-	resp, err := g.upstream.Do(head)
+	if hcAuthorID == "" {
+		Log(ctx).Warn("unable to resolve author", "grAuthorID", grAuthorID, "hit", ok)
+		return nil, fmt.Errorf("unable to resolve author %d", grAuthorID)
+
+	}
+
+	aid, _ := pathToID(hcAuthorID)
+	gar, err := hardcover.GetAuthor(ctx, g.gql, aid)
 	if err != nil {
-		return 0, fmt.Errorf("problem getting HEAD: %w", err)
+		return nil, fmt.Errorf("getting author: %w", err)
 	}
 
-	location := resp.Header.Get("location")
-	if location == "" {
-		return 0, fmt.Errorf("missing location header")
+	authorRsc := AuthorResource{
+		KCA:         fmt.Sprint(gar.Authors_by_pk.Id),
+		Name:        gar.Authors_by_pk.Name,
+		ForeignID:   grAuthorID,
+		URL:         "https://hardcover.app/authors/" + gar.Authors_by_pk.Slug,
+		ImageURL:    strings.ReplaceAll(string(gar.Authors_by_pk.Cached_image), `"`, ``),
+		Description: gar.Authors_by_pk.Bio,
+		Works:       []workResource{},
 	}
 
-	id, err := pathToID(location)
+	grBookIDs, err := hardcover.GetAuthorEditions(ctx, g.gql, grAuthorID, 20, 0)
 	if err != nil {
-		Log(ctx).Warn("likely auth error", "err", err, "head", url, "redirect", location)
-		return 0, fmt.Errorf("invalid redirect, likely auth error: %w", err)
+		return nil, err
+	}
+	for _, cont := range grBookIDs.Authors_by_pk.Contributions {
+		if len(cont.Book.Book_mappings) == 0 {
+			Log(ctx).Warn("no book mappings found", "grAuthorID", grAuthorID)
+			continue
+		}
+
+		grBookID, _ := pathToID(cont.Book.Book_mappings[0].External_id)
+		workBytes, _, _, err := g.GetBook(ctx, grBookID)
+		if err != nil {
+			Log(ctx).Warn("getting edition", "err", err, "grBooKID", grBookID)
+			continue
+		}
+		var workRsc workResource
+		err = json.Unmarshal(workBytes, &workRsc)
+		if err != nil {
+			authorRsc.Works = []workResource{workRsc}
+			break
+		}
 	}
 
-	return id, nil
+	return json.Marshal(authorRsc)
 }

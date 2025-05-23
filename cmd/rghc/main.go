@@ -28,11 +28,7 @@ type server struct {
 	cmd.PGConfig
 	cmd.LogConfig
 
-	Port     int    `default:"8788" env:"PORT" help:"Port to serve traffic on."`
-	RPM      int    `default:"60" env:"RPM" help:"Maximum upstream requests per minute."`
-	Cookie   string `env:"COOKIE" help:"Cookie to use for upstream HTTP requests."`
-	Proxy    string `default:"" env:"PROXY" help:"HTTP proxy URL to use for upstream requests."`
-	Upstream string `required:"" env:"UPSTREAM" help:"Upstream host (e.g. www.example.com)."`
+	Port int `default:"8788" env:"PORT" help:"Port to serve traffic on."`
 
 	HardcoverAuth string `required:"" env:"HARDCOVER_AUTH" help:"Hardcover Authorization header, e.g. 'Bearer ...'"`
 }
@@ -44,11 +40,6 @@ func (s *server) Run() error {
 	cache, err := internal.NewCache(ctx, s.DSN())
 	if err != nil {
 		return fmt.Errorf("setting up cache: %w", err)
-	}
-
-	upstream, err := internal.NewUpstream(s.Upstream, s.Cookie, s.Proxy)
-	if err != nil {
-		return err
 	}
 
 	hcTransport := internal.ScopedTransport{
@@ -67,7 +58,12 @@ func (s *server) Run() error {
 		return err
 	}
 
-	getter, err := internal.NewHardcoverGetter(cache, gql, upstream)
+	mapper, err := internal.NewHCMapper(http.DefaultClient)
+	if err != nil {
+		return err
+	}
+
+	getter, err := internal.NewHardcoverGetter(cache, gql, mapper)
 	if err != nil {
 		return err
 	}
