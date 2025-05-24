@@ -1,31 +1,65 @@
-query GetBook($grBookID: String!) {
+query Search(
+  $query: String!
+  $fields: String!
+  $weights: String!
+  $query_type: String!
+  $sort: String!
+) {
+  search(
+    query: $query
+    fields: $fields
+    weights: $weights
+    query_type: $query_type
+    sort: $sort
+  ) {
+    ids
+    results
+  }
+}
+
+query GetEditionByISBN13($isbn13: String!) {
+  editions(where: { isbn_13: { _eq: $isbn13 } }) {
+    id
+    book_id
+  }
+}
+
+query GetEditionByGR($grBookID: String) {
   book_mappings(
     limit: 1
     where: { platform_id: { _eq: 1 }, external_id: { _eq: $grBookID } }
   ) {
-    external_id
     edition {
       id
-      title
-      subtitle
-      asin
-      isbn_13
-      edition_format
-      pages
-      audio_seconds
-      language {
-        language
-      }
-      publisher {
-        name
-      }
-      release_date
-      description
-      identifiers
-      book_id
     }
     book {
       id
+    }
+  }
+}
+
+query GetEditionByHC($hcEditionID: Int!) {
+  editions_by_pk(id: $hcEditionID) {
+    id
+    title
+    subtitle
+    asin
+    isbn_13
+    edition_format
+    pages
+    audio_seconds
+    language {
+      language
+    }
+    publisher {
+      name
+    }
+    release_date
+    description
+    identifiers
+    book {
+      id
+      default_cover_edition_id
       title
       subtitle
       description
@@ -62,13 +96,92 @@ query GetBook($grBookID: String!) {
   }
 }
 
-query GetAuthor($id: Int!) {
-  authors_by_pk(id: $id) {
+query GetAuthorBooks($hcAuthorID: Int) {
+  contributions(
+    where: {
+      _and: { author_id: { _eq: $hcAuthorID } }
+      contributable_type: { _eq: "Book" }
+    }
+    order_by: { book: { users_count: desc_nulls_last } }
+  ) {
+    book {
       id
-      name
-      slug
-      bio
+    }
+  }
+}
+
+query GetAuthor($hcAuthorID: Int!) {
+  authors_by_pk(id: $hcAuthorID) {
+    id
+    name
+    slug
+    bio
+    cached_image(path: "url")
+  }
+}
+
+query GetBook($grBookID: String!) {
+  book_mappings(
+    limit: 1
+    where: { platform_id: { _eq: 1 }, external_id: { _eq: $grBookID } }
+  ) {
+    external_id
+    edition {
+      id
+      title
+      subtitle
+      asin
+      isbn_13
+      edition_format
+      pages
+      audio_seconds
+      language {
+        language
+      }
+      publisher {
+        name
+      }
+      release_date
+      description
+      identifiers
+      book_id
+    }
+    book {
+      id
+      title
+      subtitle
+      description
+      release_date
+      cached_tags(path: "$.Genre")
       cached_image(path: "url")
+      default_cover_edition_id
+      contributions {
+        contributable_type
+        contribution
+        author {
+          id
+          name
+          slug
+          bio
+          cached_image(path: "url")
+        }
+      }
+      slug
+      book_series {
+        position
+        series {
+          id
+          name
+          description
+          identifiers
+        }
+      }
+      book_mappings {
+        dto_external
+      }
+      rating
+      ratings_count
+    }
   }
 }
 

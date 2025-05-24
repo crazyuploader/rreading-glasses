@@ -185,6 +185,29 @@ func TestBatching(t *testing.T) {
 	assert.Less(t, time.Since(start), 4*time.Second)
 }
 
+func TestBatchingError(t *testing.T) {
+	apiKey := os.Getenv("HARDCOVER_API_KEY")
+	if apiKey == "" {
+		t.Skip("missing HARDCOVER_API_KEY")
+		return
+	}
+	transport := &HeaderTransport{
+		Key:          "Authorization",
+		Value:        apiKey,
+		RoundTripper: http.DefaultTransport,
+	}
+
+	client := &http.Client{Transport: transport}
+
+	url := "https://api.hardcover.app/v1/graphql"
+
+	gql, err := NewBatchedGraphQLClient(url, client, time.Second)
+	require.NoError(t, err)
+
+	_, err = hardcover.GetBook(context.Background(), gql, "0156028352")
+	assert.NoError(t, err)
+}
+
 func TestGQLStatusCode(t *testing.T) {
 	err := &gqlerror.Error{Message: "womp"}
 	assert.ErrorIs(t, err, gqlStatusErr(err))

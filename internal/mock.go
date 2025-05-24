@@ -41,18 +41,18 @@ func (m *Mockgetter) EXPECT() *MockgetterMockRecorder {
 }
 
 // GetAuthor mocks base method.
-func (m *Mockgetter) GetAuthor(ctx context.Context, authorID int64) ([]byte, error) {
+func (m *Mockgetter) GetAuthor(ctx context.Context, grAuthorID int64) ([]byte, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAuthor", ctx, authorID)
+	ret := m.ctrl.Call(m, "GetAuthor", ctx, grAuthorID)
 	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAuthor indicates an expected call of GetAuthor.
-func (mr *MockgetterMockRecorder) GetAuthor(ctx, authorID any) *MockgetterGetAuthorCall {
+func (mr *MockgetterMockRecorder) GetAuthor(ctx, grAuthorID any) *MockgetterGetAuthorCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthor", reflect.TypeOf((*Mockgetter)(nil).GetAuthor), ctx, authorID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthor", reflect.TypeOf((*Mockgetter)(nil).GetAuthor), ctx, grAuthorID)
 	return &MockgetterGetAuthorCall{Call: call}
 }
 
@@ -80,17 +80,17 @@ func (c *MockgetterGetAuthorCall) DoAndReturn(f func(context.Context, int64) ([]
 }
 
 // GetAuthorBooks mocks base method.
-func (m *Mockgetter) GetAuthorBooks(ctx context.Context, authorID int64) iter.Seq[int64] {
+func (m *Mockgetter) GetAuthorBooks(ctx context.Context, grAuthorID int64) iter.Seq[int64] {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAuthorBooks", ctx, authorID)
+	ret := m.ctrl.Call(m, "GetAuthorBooks", ctx, grAuthorID)
 	ret0, _ := ret[0].(iter.Seq[int64])
 	return ret0
 }
 
 // GetAuthorBooks indicates an expected call of GetAuthorBooks.
-func (mr *MockgetterMockRecorder) GetAuthorBooks(ctx, authorID any) *MockgetterGetAuthorBooksCall {
+func (mr *MockgetterMockRecorder) GetAuthorBooks(ctx, grAuthorID any) *MockgetterGetAuthorBooksCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthorBooks", reflect.TypeOf((*Mockgetter)(nil).GetAuthorBooks), ctx, authorID)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAuthorBooks", reflect.TypeOf((*Mockgetter)(nil).GetAuthorBooks), ctx, grAuthorID)
 	return &MockgetterGetAuthorBooksCall{Call: call}
 }
 
@@ -141,8 +141,8 @@ type MockgetterGetBookCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockgetterGetBookCall) Return(arg0 []byte, workID, authorID int64, arg3 error) *MockgetterGetBookCall {
-	c.Call = c.Call.Return(arg0, workID, authorID, arg3)
+func (c *MockgetterGetBookCall) Return(arg0 []byte, grWorkID, grAuthorID int64, arg3 error) *MockgetterGetBookCall {
+	c.Call = c.Call.Return(arg0, grWorkID, grAuthorID, arg3)
 	return c
 }
 
@@ -181,8 +181,8 @@ type MockgetterGetWorkCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockgetterGetWorkCall) Return(arg0 []byte, authorID int64, arg2 error) *MockgetterGetWorkCall {
-	c.Call = c.Call.Return(arg0, authorID, arg2)
+func (c *MockgetterGetWorkCall) Return(arg0 []byte, grAuthorID int64, arg2 error) *MockgetterGetWorkCall {
+	c.Call = c.Call.Return(arg0, grAuthorID, arg2)
 	return c
 }
 

@@ -64,10 +64,10 @@ type Controller struct {
 // getter allows alternative implementations of the core logic to be injected.
 // Don't write to the cache if you use it.
 type getter interface {
-	GetWork(ctx context.Context, workID int64) (_ []byte, authorID int64, _ error)
-	GetBook(ctx context.Context, bookID int64) (_ []byte, workID int64, authorID int64, _ error) // Returns a serialized Work??
-	GetAuthor(ctx context.Context, authorID int64) ([]byte, error)
-	GetAuthorBooks(ctx context.Context, authorID int64) iter.Seq[int64] // Returns book/edition IDs, not works.
+	GetWork(ctx context.Context, workID int64) (_ []byte, grAuthorID int64, _ error)
+	GetBook(ctx context.Context, bookID int64) (_ []byte, grWorkID int64, grAuthorID int64, _ error) // Returns a serialized Work??
+	GetAuthor(ctx context.Context, grAuthorID int64) ([]byte, error)
+	GetAuthorBooks(ctx context.Context, grAuthorID int64) iter.Seq[int64] // Returns book/edition IDs, not works.
 }
 
 // NewUpstream creates a new http.Client with middleware appropriate for use

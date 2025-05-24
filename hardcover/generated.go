@@ -36,6 +36,40 @@ func (v *GetAuthorAuthors_by_pkAuthors) GetBio() string { return v.Bio }
 // GetCached_image returns GetAuthorAuthors_by_pkAuthors.Cached_image, and is useful for accessing the field via an interface.
 func (v *GetAuthorAuthors_by_pkAuthors) GetCached_image() json.RawMessage { return v.Cached_image }
 
+// GetAuthorBooksContributions includes the requested fields of the GraphQL type contributions.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "contributions"
+type GetAuthorBooksContributions struct {
+	// An object relationship
+	Book GetAuthorBooksContributionsBookBooks `json:"book"`
+}
+
+// GetBook returns GetAuthorBooksContributions.Book, and is useful for accessing the field via an interface.
+func (v *GetAuthorBooksContributions) GetBook() GetAuthorBooksContributionsBookBooks { return v.Book }
+
+// GetAuthorBooksContributionsBookBooks includes the requested fields of the GraphQL type books.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "books"
+type GetAuthorBooksContributionsBookBooks struct {
+	Id int64 `json:"id"`
+}
+
+// GetId returns GetAuthorBooksContributionsBookBooks.Id, and is useful for accessing the field via an interface.
+func (v *GetAuthorBooksContributionsBookBooks) GetId() int64 { return v.Id }
+
+// GetAuthorBooksResponse is returned by GetAuthorBooks on success.
+type GetAuthorBooksResponse struct {
+	// An array relationship
+	Contributions []GetAuthorBooksContributions `json:"contributions"`
+}
+
+// GetContributions returns GetAuthorBooksResponse.Contributions, and is useful for accessing the field via an interface.
+func (v *GetAuthorBooksResponse) GetContributions() []GetAuthorBooksContributions {
+	return v.Contributions
+}
+
 // GetAuthorEditionsAuthors_by_pkAuthors includes the requested fields of the GraphQL type authors.
 // The GraphQL type's documentation follows.
 //
@@ -183,13 +217,14 @@ func (v *GetBookBook_mappings) GetBook() GetBookBook_mappingsBookBooks { return 
 //
 // columns and relationships of "books"
 type GetBookBook_mappingsBookBooks struct {
-	Id           int64           `json:"id"`
-	Title        string          `json:"title"`
-	Subtitle     string          `json:"subtitle"`
-	Description  string          `json:"description"`
-	Release_date string          `json:"release_date"`
-	Cached_tags  json.RawMessage `json:"cached_tags"`
-	Cached_image json.RawMessage `json:"cached_image"`
+	Id                       int64           `json:"id"`
+	Title                    string          `json:"title"`
+	Subtitle                 string          `json:"subtitle"`
+	Description              string          `json:"description"`
+	Release_date             string          `json:"release_date"`
+	Cached_tags              json.RawMessage `json:"cached_tags"`
+	Cached_image             json.RawMessage `json:"cached_image"`
+	Default_cover_edition_id int64           `json:"default_cover_edition_id"`
 	// An array relationship
 	Contributions []GetBookBook_mappingsBookBooksContributions `json:"contributions"`
 	Slug          string                                       `json:"slug"`
@@ -221,6 +256,11 @@ func (v *GetBookBook_mappingsBookBooks) GetCached_tags() json.RawMessage { retur
 
 // GetCached_image returns GetBookBook_mappingsBookBooks.Cached_image, and is useful for accessing the field via an interface.
 func (v *GetBookBook_mappingsBookBooks) GetCached_image() json.RawMessage { return v.Cached_image }
+
+// GetDefault_cover_edition_id returns GetBookBook_mappingsBookBooks.Default_cover_edition_id, and is useful for accessing the field via an interface.
+func (v *GetBookBook_mappingsBookBooks) GetDefault_cover_edition_id() int64 {
+	return v.Default_cover_edition_id
+}
 
 // GetContributions returns GetBookBook_mappingsBookBooks.Contributions, and is useful for accessing the field via an interface.
 func (v *GetBookBook_mappingsBookBooks) GetContributions() []GetBookBook_mappingsBookBooksContributions {
@@ -459,6 +499,424 @@ type GetBookResponse struct {
 // GetBook_mappings returns GetBookResponse.Book_mappings, and is useful for accessing the field via an interface.
 func (v *GetBookResponse) GetBook_mappings() []GetBookBook_mappings { return v.Book_mappings }
 
+// GetEditionByGRBook_mappings includes the requested fields of the GraphQL type book_mappings.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "book_mappings"
+type GetEditionByGRBook_mappings struct {
+	// An object relationship
+	Edition GetEditionByGRBook_mappingsEditionEditions `json:"edition"`
+	// An object relationship
+	Book GetEditionByGRBook_mappingsBookBooks `json:"book"`
+}
+
+// GetEdition returns GetEditionByGRBook_mappings.Edition, and is useful for accessing the field via an interface.
+func (v *GetEditionByGRBook_mappings) GetEdition() GetEditionByGRBook_mappingsEditionEditions {
+	return v.Edition
+}
+
+// GetBook returns GetEditionByGRBook_mappings.Book, and is useful for accessing the field via an interface.
+func (v *GetEditionByGRBook_mappings) GetBook() GetEditionByGRBook_mappingsBookBooks { return v.Book }
+
+// GetEditionByGRBook_mappingsBookBooks includes the requested fields of the GraphQL type books.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "books"
+type GetEditionByGRBook_mappingsBookBooks struct {
+	Id int64 `json:"id"`
+}
+
+// GetId returns GetEditionByGRBook_mappingsBookBooks.Id, and is useful for accessing the field via an interface.
+func (v *GetEditionByGRBook_mappingsBookBooks) GetId() int64 { return v.Id }
+
+// GetEditionByGRBook_mappingsEditionEditions includes the requested fields of the GraphQL type editions.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "editions"
+type GetEditionByGRBook_mappingsEditionEditions struct {
+	Id int64 `json:"id"`
+}
+
+// GetId returns GetEditionByGRBook_mappingsEditionEditions.Id, and is useful for accessing the field via an interface.
+func (v *GetEditionByGRBook_mappingsEditionEditions) GetId() int64 { return v.Id }
+
+// GetEditionByGRResponse is returned by GetEditionByGR on success.
+type GetEditionByGRResponse struct {
+	// An array relationship
+	Book_mappings []GetEditionByGRBook_mappings `json:"book_mappings"`
+}
+
+// GetBook_mappings returns GetEditionByGRResponse.Book_mappings, and is useful for accessing the field via an interface.
+func (v *GetEditionByGRResponse) GetBook_mappings() []GetEditionByGRBook_mappings {
+	return v.Book_mappings
+}
+
+// GetEditionByHCEditions_by_pkEditions includes the requested fields of the GraphQL type editions.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "editions"
+type GetEditionByHCEditions_by_pkEditions struct {
+	Id             int64  `json:"id"`
+	Title          string `json:"title"`
+	Subtitle       string `json:"subtitle"`
+	Asin           string `json:"asin"`
+	Isbn_13        string `json:"isbn_13"`
+	Edition_format string `json:"edition_format"`
+	Pages          int64  `json:"pages"`
+	Audio_seconds  int64  `json:"audio_seconds"`
+	// An object relationship
+	Language GetEditionByHCEditions_by_pkEditionsLanguageLanguages `json:"language"`
+	// An object relationship
+	Publisher    GetEditionByHCEditions_by_pkEditionsPublisherPublishers `json:"publisher"`
+	Release_date string                                                  `json:"release_date"`
+	Description  string                                                  `json:"description"`
+	Identifiers  json.RawMessage                                         `json:"identifiers"`
+	// An object relationship
+	Book GetEditionByHCEditions_by_pkEditionsBookBooks `json:"book"`
+}
+
+// GetId returns GetEditionByHCEditions_by_pkEditions.Id, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetId() int64 { return v.Id }
+
+// GetTitle returns GetEditionByHCEditions_by_pkEditions.Title, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetTitle() string { return v.Title }
+
+// GetSubtitle returns GetEditionByHCEditions_by_pkEditions.Subtitle, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetSubtitle() string { return v.Subtitle }
+
+// GetAsin returns GetEditionByHCEditions_by_pkEditions.Asin, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetAsin() string { return v.Asin }
+
+// GetIsbn_13 returns GetEditionByHCEditions_by_pkEditions.Isbn_13, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetIsbn_13() string { return v.Isbn_13 }
+
+// GetEdition_format returns GetEditionByHCEditions_by_pkEditions.Edition_format, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetEdition_format() string { return v.Edition_format }
+
+// GetPages returns GetEditionByHCEditions_by_pkEditions.Pages, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetPages() int64 { return v.Pages }
+
+// GetAudio_seconds returns GetEditionByHCEditions_by_pkEditions.Audio_seconds, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetAudio_seconds() int64 { return v.Audio_seconds }
+
+// GetLanguage returns GetEditionByHCEditions_by_pkEditions.Language, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetLanguage() GetEditionByHCEditions_by_pkEditionsLanguageLanguages {
+	return v.Language
+}
+
+// GetPublisher returns GetEditionByHCEditions_by_pkEditions.Publisher, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetPublisher() GetEditionByHCEditions_by_pkEditionsPublisherPublishers {
+	return v.Publisher
+}
+
+// GetRelease_date returns GetEditionByHCEditions_by_pkEditions.Release_date, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetRelease_date() string { return v.Release_date }
+
+// GetDescription returns GetEditionByHCEditions_by_pkEditions.Description, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetDescription() string { return v.Description }
+
+// GetIdentifiers returns GetEditionByHCEditions_by_pkEditions.Identifiers, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetIdentifiers() json.RawMessage { return v.Identifiers }
+
+// GetBook returns GetEditionByHCEditions_by_pkEditions.Book, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditions) GetBook() GetEditionByHCEditions_by_pkEditionsBookBooks {
+	return v.Book
+}
+
+// GetEditionByHCEditions_by_pkEditionsBookBooks includes the requested fields of the GraphQL type books.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "books"
+type GetEditionByHCEditions_by_pkEditionsBookBooks struct {
+	Id                       int64           `json:"id"`
+	Default_cover_edition_id int64           `json:"default_cover_edition_id"`
+	Title                    string          `json:"title"`
+	Subtitle                 string          `json:"subtitle"`
+	Description              string          `json:"description"`
+	Release_date             string          `json:"release_date"`
+	Cached_tags              json.RawMessage `json:"cached_tags"`
+	Cached_image             json.RawMessage `json:"cached_image"`
+	// An array relationship
+	Contributions []GetEditionByHCEditions_by_pkEditionsBookBooksContributions `json:"contributions"`
+	Slug          string                                                       `json:"slug"`
+	// An array relationship
+	Book_series []GetEditionByHCEditions_by_pkEditionsBookBooksBook_series `json:"book_series"`
+	// An array relationship
+	Book_mappings []GetEditionByHCEditions_by_pkEditionsBookBooksBook_mappings `json:"book_mappings"`
+	Rating        float64                                                      `json:"rating"`
+	Ratings_count int64                                                        `json:"ratings_count"`
+}
+
+// GetId returns GetEditionByHCEditions_by_pkEditionsBookBooks.Id, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetId() int64 { return v.Id }
+
+// GetDefault_cover_edition_id returns GetEditionByHCEditions_by_pkEditionsBookBooks.Default_cover_edition_id, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetDefault_cover_edition_id() int64 {
+	return v.Default_cover_edition_id
+}
+
+// GetTitle returns GetEditionByHCEditions_by_pkEditionsBookBooks.Title, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetTitle() string { return v.Title }
+
+// GetSubtitle returns GetEditionByHCEditions_by_pkEditionsBookBooks.Subtitle, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetSubtitle() string { return v.Subtitle }
+
+// GetDescription returns GetEditionByHCEditions_by_pkEditionsBookBooks.Description, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetDescription() string { return v.Description }
+
+// GetRelease_date returns GetEditionByHCEditions_by_pkEditionsBookBooks.Release_date, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetRelease_date() string {
+	return v.Release_date
+}
+
+// GetCached_tags returns GetEditionByHCEditions_by_pkEditionsBookBooks.Cached_tags, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetCached_tags() json.RawMessage {
+	return v.Cached_tags
+}
+
+// GetCached_image returns GetEditionByHCEditions_by_pkEditionsBookBooks.Cached_image, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetCached_image() json.RawMessage {
+	return v.Cached_image
+}
+
+// GetContributions returns GetEditionByHCEditions_by_pkEditionsBookBooks.Contributions, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetContributions() []GetEditionByHCEditions_by_pkEditionsBookBooksContributions {
+	return v.Contributions
+}
+
+// GetSlug returns GetEditionByHCEditions_by_pkEditionsBookBooks.Slug, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetSlug() string { return v.Slug }
+
+// GetBook_series returns GetEditionByHCEditions_by_pkEditionsBookBooks.Book_series, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetBook_series() []GetEditionByHCEditions_by_pkEditionsBookBooksBook_series {
+	return v.Book_series
+}
+
+// GetBook_mappings returns GetEditionByHCEditions_by_pkEditionsBookBooks.Book_mappings, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetBook_mappings() []GetEditionByHCEditions_by_pkEditionsBookBooksBook_mappings {
+	return v.Book_mappings
+}
+
+// GetRating returns GetEditionByHCEditions_by_pkEditionsBookBooks.Rating, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetRating() float64 { return v.Rating }
+
+// GetRatings_count returns GetEditionByHCEditions_by_pkEditionsBookBooks.Ratings_count, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooks) GetRatings_count() int64 {
+	return v.Ratings_count
+}
+
+// GetEditionByHCEditions_by_pkEditionsBookBooksBook_mappings includes the requested fields of the GraphQL type book_mappings.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "book_mappings"
+type GetEditionByHCEditions_by_pkEditionsBookBooksBook_mappings struct {
+	Dto_external json.RawMessage `json:"dto_external"`
+}
+
+// GetDto_external returns GetEditionByHCEditions_by_pkEditionsBookBooksBook_mappings.Dto_external, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksBook_mappings) GetDto_external() json.RawMessage {
+	return v.Dto_external
+}
+
+// GetEditionByHCEditions_by_pkEditionsBookBooksBook_series includes the requested fields of the GraphQL type book_series.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "book_series"
+type GetEditionByHCEditions_by_pkEditionsBookBooksBook_series struct {
+	Position float32 `json:"position"`
+	// An object relationship
+	Series GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries `json:"series"`
+}
+
+// GetPosition returns GetEditionByHCEditions_by_pkEditionsBookBooksBook_series.Position, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksBook_series) GetPosition() float32 {
+	return v.Position
+}
+
+// GetSeries returns GetEditionByHCEditions_by_pkEditionsBookBooksBook_series.Series, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksBook_series) GetSeries() GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries {
+	return v.Series
+}
+
+// GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries includes the requested fields of the GraphQL type series.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "series"
+type GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries struct {
+	Id          int64           `json:"id"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Identifiers json.RawMessage `json:"identifiers"`
+}
+
+// GetId returns GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries.Id, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries) GetId() int64 { return v.Id }
+
+// GetName returns GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries.Name, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries) GetName() string {
+	return v.Name
+}
+
+// GetDescription returns GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries.Description, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries) GetDescription() string {
+	return v.Description
+}
+
+// GetIdentifiers returns GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries.Identifiers, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksBook_seriesSeries) GetIdentifiers() json.RawMessage {
+	return v.Identifiers
+}
+
+// GetEditionByHCEditions_by_pkEditionsBookBooksContributions includes the requested fields of the GraphQL type contributions.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "contributions"
+type GetEditionByHCEditions_by_pkEditionsBookBooksContributions struct {
+	Contributable_type string `json:"contributable_type"`
+	Contribution       string `json:"contribution"`
+	// An object relationship
+	Author GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors `json:"author"`
+}
+
+// GetContributable_type returns GetEditionByHCEditions_by_pkEditionsBookBooksContributions.Contributable_type, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksContributions) GetContributable_type() string {
+	return v.Contributable_type
+}
+
+// GetContribution returns GetEditionByHCEditions_by_pkEditionsBookBooksContributions.Contribution, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksContributions) GetContribution() string {
+	return v.Contribution
+}
+
+// GetAuthor returns GetEditionByHCEditions_by_pkEditionsBookBooksContributions.Author, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksContributions) GetAuthor() GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors {
+	return v.Author
+}
+
+// GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors includes the requested fields of the GraphQL type authors.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "authors"
+type GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors struct {
+	Id           int64           `json:"id"`
+	Name         string          `json:"name"`
+	Slug         string          `json:"slug"`
+	Bio          string          `json:"bio"`
+	Cached_image json.RawMessage `json:"cached_image"`
+}
+
+// GetId returns GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors.Id, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors) GetId() int64 {
+	return v.Id
+}
+
+// GetName returns GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors.Name, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors) GetName() string {
+	return v.Name
+}
+
+// GetSlug returns GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors.Slug, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors) GetSlug() string {
+	return v.Slug
+}
+
+// GetBio returns GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors.Bio, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors) GetBio() string {
+	return v.Bio
+}
+
+// GetCached_image returns GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors.Cached_image, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsBookBooksContributionsAuthorAuthors) GetCached_image() json.RawMessage {
+	return v.Cached_image
+}
+
+// GetEditionByHCEditions_by_pkEditionsLanguageLanguages includes the requested fields of the GraphQL type languages.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "languages"
+type GetEditionByHCEditions_by_pkEditionsLanguageLanguages struct {
+	Language string `json:"language"`
+}
+
+// GetLanguage returns GetEditionByHCEditions_by_pkEditionsLanguageLanguages.Language, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsLanguageLanguages) GetLanguage() string {
+	return v.Language
+}
+
+// GetEditionByHCEditions_by_pkEditionsPublisherPublishers includes the requested fields of the GraphQL type publishers.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "publishers"
+type GetEditionByHCEditions_by_pkEditionsPublisherPublishers struct {
+	Name string `json:"name"`
+}
+
+// GetName returns GetEditionByHCEditions_by_pkEditionsPublisherPublishers.Name, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCEditions_by_pkEditionsPublisherPublishers) GetName() string { return v.Name }
+
+// GetEditionByHCResponse is returned by GetEditionByHC on success.
+type GetEditionByHCResponse struct {
+	// fetch data from the table: "editions" using primary key columns
+	Editions_by_pk GetEditionByHCEditions_by_pkEditions `json:"editions_by_pk"`
+}
+
+// GetEditions_by_pk returns GetEditionByHCResponse.Editions_by_pk, and is useful for accessing the field via an interface.
+func (v *GetEditionByHCResponse) GetEditions_by_pk() GetEditionByHCEditions_by_pkEditions {
+	return v.Editions_by_pk
+}
+
+// GetEditionByISBN13Editions includes the requested fields of the GraphQL type editions.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "editions"
+type GetEditionByISBN13Editions struct {
+	Id      int64 `json:"id"`
+	Book_id int64 `json:"book_id"`
+}
+
+// GetId returns GetEditionByISBN13Editions.Id, and is useful for accessing the field via an interface.
+func (v *GetEditionByISBN13Editions) GetId() int64 { return v.Id }
+
+// GetBook_id returns GetEditionByISBN13Editions.Book_id, and is useful for accessing the field via an interface.
+func (v *GetEditionByISBN13Editions) GetBook_id() int64 { return v.Book_id }
+
+// GetEditionByISBN13Response is returned by GetEditionByISBN13 on success.
+type GetEditionByISBN13Response struct {
+	// An array relationship
+	Editions []GetEditionByISBN13Editions `json:"editions"`
+}
+
+// GetEditions returns GetEditionByISBN13Response.Editions, and is useful for accessing the field via an interface.
+func (v *GetEditionByISBN13Response) GetEditions() []GetEditionByISBN13Editions { return v.Editions }
+
+// SearchResponse is returned by Search on success.
+type SearchResponse struct {
+	Search SearchSearchSearchOutput `json:"search"`
+}
+
+// GetSearch returns SearchResponse.Search, and is useful for accessing the field via an interface.
+func (v *SearchResponse) GetSearch() SearchSearchSearchOutput { return v.Search }
+
+// SearchSearchSearchOutput includes the requested fields of the GraphQL type SearchOutput.
+type SearchSearchSearchOutput struct {
+	Ids     []int64         `json:"ids"`
+	Results json.RawMessage `json:"results"`
+}
+
+// GetIds returns SearchSearchSearchOutput.Ids, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchOutput) GetIds() []int64 { return v.Ids }
+
+// GetResults returns SearchSearchSearchOutput.Results, and is useful for accessing the field via an interface.
+func (v *SearchSearchSearchOutput) GetResults() json.RawMessage { return v.Results }
+
+// __GetAuthorBooksInput is used internally by genqlient
+type __GetAuthorBooksInput struct {
+	HcAuthorID int64 `json:"hcAuthorID"`
+}
+
+// GetHcAuthorID returns __GetAuthorBooksInput.HcAuthorID, and is useful for accessing the field via an interface.
+func (v *__GetAuthorBooksInput) GetHcAuthorID() int64 { return v.HcAuthorID }
+
 // __GetAuthorEditionsInput is used internally by genqlient
 type __GetAuthorEditionsInput struct {
 	Id     int64 `json:"id"`
@@ -477,11 +935,11 @@ func (v *__GetAuthorEditionsInput) GetOffset() int64 { return v.Offset }
 
 // __GetAuthorInput is used internally by genqlient
 type __GetAuthorInput struct {
-	Id int64 `json:"id"`
+	HcAuthorID int64 `json:"hcAuthorID"`
 }
 
-// GetId returns __GetAuthorInput.Id, and is useful for accessing the field via an interface.
-func (v *__GetAuthorInput) GetId() int64 { return v.Id }
+// GetHcAuthorID returns __GetAuthorInput.HcAuthorID, and is useful for accessing the field via an interface.
+func (v *__GetAuthorInput) GetHcAuthorID() int64 { return v.HcAuthorID }
 
 // __GetBookInput is used internally by genqlient
 type __GetBookInput struct {
@@ -491,10 +949,58 @@ type __GetBookInput struct {
 // GetGrBookID returns __GetBookInput.GrBookID, and is useful for accessing the field via an interface.
 func (v *__GetBookInput) GetGrBookID() string { return v.GrBookID }
 
+// __GetEditionByGRInput is used internally by genqlient
+type __GetEditionByGRInput struct {
+	GrBookID string `json:"grBookID"`
+}
+
+// GetGrBookID returns __GetEditionByGRInput.GrBookID, and is useful for accessing the field via an interface.
+func (v *__GetEditionByGRInput) GetGrBookID() string { return v.GrBookID }
+
+// __GetEditionByHCInput is used internally by genqlient
+type __GetEditionByHCInput struct {
+	HcEditionID int64 `json:"hcEditionID"`
+}
+
+// GetHcEditionID returns __GetEditionByHCInput.HcEditionID, and is useful for accessing the field via an interface.
+func (v *__GetEditionByHCInput) GetHcEditionID() int64 { return v.HcEditionID }
+
+// __GetEditionByISBN13Input is used internally by genqlient
+type __GetEditionByISBN13Input struct {
+	Isbn13 string `json:"isbn13"`
+}
+
+// GetIsbn13 returns __GetEditionByISBN13Input.Isbn13, and is useful for accessing the field via an interface.
+func (v *__GetEditionByISBN13Input) GetIsbn13() string { return v.Isbn13 }
+
+// __SearchInput is used internally by genqlient
+type __SearchInput struct {
+	Query      string `json:"query"`
+	Fields     string `json:"fields"`
+	Weights    string `json:"weights"`
+	Query_type string `json:"query_type"`
+	Sort       string `json:"sort"`
+}
+
+// GetQuery returns __SearchInput.Query, and is useful for accessing the field via an interface.
+func (v *__SearchInput) GetQuery() string { return v.Query }
+
+// GetFields returns __SearchInput.Fields, and is useful for accessing the field via an interface.
+func (v *__SearchInput) GetFields() string { return v.Fields }
+
+// GetWeights returns __SearchInput.Weights, and is useful for accessing the field via an interface.
+func (v *__SearchInput) GetWeights() string { return v.Weights }
+
+// GetQuery_type returns __SearchInput.Query_type, and is useful for accessing the field via an interface.
+func (v *__SearchInput) GetQuery_type() string { return v.Query_type }
+
+// GetSort returns __SearchInput.Sort, and is useful for accessing the field via an interface.
+func (v *__SearchInput) GetSort() string { return v.Sort }
+
 // The query or mutation executed by GetAuthor.
 const GetAuthor_Operation = `
-query GetAuthor ($id: Int!) {
-	authors_by_pk(id: $id) {
+query GetAuthor ($hcAuthorID: Int!) {
+	authors_by_pk(id: $hcAuthorID) {
 		id
 		name
 		slug
@@ -507,18 +1013,55 @@ query GetAuthor ($id: Int!) {
 func GetAuthor(
 	ctx_ context.Context,
 	client_ graphql.Client,
-	id int64,
+	hcAuthorID int64,
 ) (*GetAuthorResponse, error) {
 	req_ := &graphql.Request{
 		OpName: "GetAuthor",
 		Query:  GetAuthor_Operation,
 		Variables: &__GetAuthorInput{
-			Id: id,
+			HcAuthorID: hcAuthorID,
 		},
 	}
 	var err_ error
 
 	var data_ GetAuthorResponse
+	resp_ := &graphql.Response{Data: &data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return &data_, err_
+}
+
+// The query or mutation executed by GetAuthorBooks.
+const GetAuthorBooks_Operation = `
+query GetAuthorBooks ($hcAuthorID: Int) {
+	contributions(where: {_and:{author_id:{_eq:$hcAuthorID}},contributable_type:{_eq:"Book"}}, order_by: {book:{users_count:desc_nulls_last}}) {
+		book {
+			id
+		}
+	}
+}
+`
+
+func GetAuthorBooks(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	hcAuthorID int64,
+) (*GetAuthorBooksResponse, error) {
+	req_ := &graphql.Request{
+		OpName: "GetAuthorBooks",
+		Query:  GetAuthorBooks_Operation,
+		Variables: &__GetAuthorBooksInput{
+			HcAuthorID: hcAuthorID,
+		},
+	}
+	var err_ error
+
+	var data_ GetAuthorBooksResponse
 	resp_ := &graphql.Response{Data: &data_}
 
 	err_ = client_.MakeRequest(
@@ -617,6 +1160,7 @@ query GetBook ($grBookID: String!) {
 			release_date
 			cached_tags(path: "$.Genre")
 			cached_image(path: "url")
+			default_cover_edition_id
 			contributions {
 				contributable_type
 				contribution
@@ -663,6 +1207,213 @@ func GetBook(
 	var err_ error
 
 	var data_ GetBookResponse
+	resp_ := &graphql.Response{Data: &data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return &data_, err_
+}
+
+// The query or mutation executed by GetEditionByGR.
+const GetEditionByGR_Operation = `
+query GetEditionByGR ($grBookID: String) {
+	book_mappings(limit: 1, where: {platform_id:{_eq:1},external_id:{_eq:$grBookID}}) {
+		edition {
+			id
+		}
+		book {
+			id
+		}
+	}
+}
+`
+
+func GetEditionByGR(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	grBookID string,
+) (*GetEditionByGRResponse, error) {
+	req_ := &graphql.Request{
+		OpName: "GetEditionByGR",
+		Query:  GetEditionByGR_Operation,
+		Variables: &__GetEditionByGRInput{
+			GrBookID: grBookID,
+		},
+	}
+	var err_ error
+
+	var data_ GetEditionByGRResponse
+	resp_ := &graphql.Response{Data: &data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return &data_, err_
+}
+
+// The query or mutation executed by GetEditionByHC.
+const GetEditionByHC_Operation = `
+query GetEditionByHC ($hcEditionID: Int!) {
+	editions_by_pk(id: $hcEditionID) {
+		id
+		title
+		subtitle
+		asin
+		isbn_13
+		edition_format
+		pages
+		audio_seconds
+		language {
+			language
+		}
+		publisher {
+			name
+		}
+		release_date
+		description
+		identifiers
+		book {
+			id
+			default_cover_edition_id
+			title
+			subtitle
+			description
+			release_date
+			cached_tags(path: "$.Genre")
+			cached_image(path: "url")
+			contributions {
+				contributable_type
+				contribution
+				author {
+					id
+					name
+					slug
+					bio
+					cached_image(path: "url")
+				}
+			}
+			slug
+			book_series {
+				position
+				series {
+					id
+					name
+					description
+					identifiers
+				}
+			}
+			book_mappings {
+				dto_external
+			}
+			rating
+			ratings_count
+		}
+	}
+}
+`
+
+func GetEditionByHC(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	hcEditionID int64,
+) (*GetEditionByHCResponse, error) {
+	req_ := &graphql.Request{
+		OpName: "GetEditionByHC",
+		Query:  GetEditionByHC_Operation,
+		Variables: &__GetEditionByHCInput{
+			HcEditionID: hcEditionID,
+		},
+	}
+	var err_ error
+
+	var data_ GetEditionByHCResponse
+	resp_ := &graphql.Response{Data: &data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return &data_, err_
+}
+
+// The query or mutation executed by GetEditionByISBN13.
+const GetEditionByISBN13_Operation = `
+query GetEditionByISBN13 ($isbn13: String) {
+	editions(where: {isbn_13:{_eq:$isbn13}}) {
+		id
+		book_id
+	}
+}
+`
+
+func GetEditionByISBN13(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	isbn13 string,
+) (*GetEditionByISBN13Response, error) {
+	req_ := &graphql.Request{
+		OpName: "GetEditionByISBN13",
+		Query:  GetEditionByISBN13_Operation,
+		Variables: &__GetEditionByISBN13Input{
+			Isbn13: isbn13,
+		},
+	}
+	var err_ error
+
+	var data_ GetEditionByISBN13Response
+	resp_ := &graphql.Response{Data: &data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return &data_, err_
+}
+
+// The query or mutation executed by Search.
+const Search_Operation = `
+query Search ($query: String!, $fields: String!, $weights: String!, $query_type: String!, $sort: String!) {
+	search(query: $query, fields: $fields, weights: $weights, query_type: $query_type, sort: $sort) {
+		ids
+		results
+	}
+}
+`
+
+func Search(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	query string,
+	fields string,
+	weights string,
+	query_type string,
+	sort string,
+) (*SearchResponse, error) {
+	req_ := &graphql.Request{
+		OpName: "Search",
+		Query:  Search_Operation,
+		Variables: &__SearchInput{
+			Query:      query,
+			Fields:     fields,
+			Weights:    weights,
+			Query_type: query_type,
+			Sort:       sort,
+		},
+	}
+	var err_ error
+
+	var data_ SearchResponse
 	resp_ := &graphql.Response{Data: &data_}
 
 	err_ = client_.MakeRequest(

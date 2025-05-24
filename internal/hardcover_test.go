@@ -293,7 +293,7 @@ func TestGetAuthor(t *testing.T) {
 		Host: "api.hardcover.app",
 		RoundTripper: &HeaderTransport{
 			Key:          "Authorization",
-			Value:        apiKey,
+			Value:        "Bearer " + apiKey,
 			RoundTripper: http.DefaultTransport,
 		},
 	}
