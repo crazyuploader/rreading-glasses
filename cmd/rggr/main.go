@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -28,11 +29,12 @@ type server struct {
 	cmd.PGConfig
 	cmd.LogConfig
 
-	Port     int    `default:"8788" env:"PORT" help:"Port to serve traffic on."`
-	RPM      int    `default:"60" env:"RPM" help:"Maximum upstream requests per minute."`
-	Cookie   string `env:"COOKIE" help:"Cookie to use for upstream HTTP requests."`
-	Proxy    string `default:"" env:"PROXY" help:"HTTP proxy URL to use for upstream requests."`
-	Upstream string `required:"" env:"UPSTREAM" help:"Upstream host (e.g. www.example.com)."`
+	Port       int    `default:"8788" env:"PORT" help:"Port to serve traffic on."`
+	RPM        int    `default:"60" env:"RPM" help:"Maximum upstream requests per minute."`
+	Cookie     string `required:"" xor:"cookie" env:"COOKIE" help:"Cookie to use for upstream HTTP requests."`
+	CookieFile []byte `required:"" type:"filecontent" xor:"cookie" env:"COOKIE_FILE" help:"File with the Cookie to use for upstream HTTP requests."`
+	Proxy      string `default:"" env:"PROXY" help:"HTTP proxy URL to use for upstream requests."`
+	Upstream   string `required:"" env:"UPSTREAM" help:"Upstream host (e.g. www.example.com)."`
 }
 
 func (s *server) Run() error {
@@ -42,6 +44,10 @@ func (s *server) Run() error {
 	cache, err := internal.NewCache(ctx, s.DSN())
 	if err != nil {
 		return fmt.Errorf("setting up cache: %w", err)
+	}
+
+	if len(s.CookieFile) > 0 {
+		s.Cookie = string(bytes.TrimSpace(s.CookieFile))
 	}
 
 	upstream, err := internal.NewUpstream(s.Upstream, s.Cookie, s.Proxy)
