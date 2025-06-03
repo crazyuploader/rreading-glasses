@@ -368,10 +368,11 @@ func (v *GetBookGetBookByLegacyIdBookStatsBookOrWorkStats) GetRatingsSum() int64
 
 // GetBookGetBookByLegacyIdBookWork includes the requested fields of the GraphQL type Work.
 type GetBookGetBookByLegacyIdBookWork struct {
-	Id       string                                   `json:"id"`
-	LegacyId int64                                    `json:"legacyId"`
-	Details  GetBookGetBookByLegacyIdBookWorkDetails  `json:"details"`
-	BestBook GetBookGetBookByLegacyIdBookWorkBestBook `json:"bestBook"`
+	Id       string                                                  `json:"id"`
+	LegacyId int64                                                   `json:"legacyId"`
+	Details  GetBookGetBookByLegacyIdBookWorkDetails                 `json:"details"`
+	BestBook GetBookGetBookByLegacyIdBookWorkBestBook                `json:"bestBook"`
+	Editions GetBookGetBookByLegacyIdBookWorkEditionsBooksConnection `json:"editions"`
 }
 
 // GetId returns GetBookGetBookByLegacyIdBookWork.Id, and is useful for accessing the field via an interface.
@@ -388,6 +389,11 @@ func (v *GetBookGetBookByLegacyIdBookWork) GetDetails() GetBookGetBookByLegacyId
 // GetBestBook returns GetBookGetBookByLegacyIdBookWork.BestBook, and is useful for accessing the field via an interface.
 func (v *GetBookGetBookByLegacyIdBookWork) GetBestBook() GetBookGetBookByLegacyIdBookWorkBestBook {
 	return v.BestBook
+}
+
+// GetEditions returns GetBookGetBookByLegacyIdBookWork.Editions, and is useful for accessing the field via an interface.
+func (v *GetBookGetBookByLegacyIdBookWork) GetEditions() GetBookGetBookByLegacyIdBookWorkEditionsBooksConnection {
+	return v.Editions
 }
 
 // GetBookGetBookByLegacyIdBookWorkBestBook includes the requested fields of the GraphQL type Book.
@@ -418,6 +424,68 @@ func (v *GetBookGetBookByLegacyIdBookWorkDetails) GetWebUrl() string { return v.
 // GetPublicationTime returns GetBookGetBookByLegacyIdBookWorkDetails.PublicationTime, and is useful for accessing the field via an interface.
 func (v *GetBookGetBookByLegacyIdBookWorkDetails) GetPublicationTime() float64 {
 	return v.PublicationTime
+}
+
+// GetBookGetBookByLegacyIdBookWorkEditionsBooksConnection includes the requested fields of the GraphQL type BooksConnection.
+type GetBookGetBookByLegacyIdBookWorkEditionsBooksConnection struct {
+	Edges []GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdge `json:"edges"`
+}
+
+// GetEdges returns GetBookGetBookByLegacyIdBookWorkEditionsBooksConnection.Edges, and is useful for accessing the field via an interface.
+func (v *GetBookGetBookByLegacyIdBookWorkEditionsBooksConnection) GetEdges() []GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdge {
+	return v.Edges
+}
+
+// GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdge includes the requested fields of the GraphQL type BooksEdge.
+type GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdge struct {
+	Node GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook `json:"node"`
+}
+
+// GetNode returns GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdge.Node, and is useful for accessing the field via an interface.
+func (v *GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdge) GetNode() GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook {
+	return v.Node
+}
+
+// GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook includes the requested fields of the GraphQL type Book.
+type GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook struct {
+	LegacyId int64                                                                                `json:"legacyId"`
+	Title    string                                                                               `json:"title"`
+	Details  GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetails `json:"details"`
+}
+
+// GetLegacyId returns GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook.LegacyId, and is useful for accessing the field via an interface.
+func (v *GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook) GetLegacyId() int64 {
+	return v.LegacyId
+}
+
+// GetTitle returns GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook.Title, and is useful for accessing the field via an interface.
+func (v *GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook) GetTitle() string {
+	return v.Title
+}
+
+// GetDetails returns GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook.Details, and is useful for accessing the field via an interface.
+func (v *GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBook) GetDetails() GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetails {
+	return v.Details
+}
+
+// GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetails includes the requested fields of the GraphQL type BookDetails.
+type GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetails struct {
+	Language GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetailsLanguage `json:"language"`
+}
+
+// GetLanguage returns GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetails.Language, and is useful for accessing the field via an interface.
+func (v *GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetails) GetLanguage() GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetailsLanguage {
+	return v.Language
+}
+
+// GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetailsLanguage includes the requested fields of the GraphQL type Language.
+type GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetailsLanguage struct {
+	Name string `json:"name"`
+}
+
+// GetName returns GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetailsLanguage.Name, and is useful for accessing the field via an interface.
+func (v *GetBookGetBookByLegacyIdBookWorkEditionsBooksConnectionEdgesBooksEdgeNodeBookDetailsLanguage) GetName() string {
+	return v.Name
 }
 
 // GetBookResponse is returned by GetBook on success.
@@ -669,6 +737,19 @@ query GetBook ($legacyId: Int!) {
 				legacyId
 				title
 				titlePrimary
+			}
+			editions {
+				edges {
+					node {
+						legacyId
+						title
+						details {
+							language {
+								name
+							}
+						}
+					}
+				}
 			}
 		}
 	}
