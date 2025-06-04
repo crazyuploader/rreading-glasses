@@ -63,8 +63,8 @@ func NewGRGQL(ctx context.Context, upstream *http.Client, cookie string) (graphq
 		},
 	}
 	// 3RPS seems to be the limit for all gql traffic, regardless of
-	// credentials, but still occasionally gives 403s. So let's try 2RPS.
-	rate := time.Second / 2.0
+	// credentials.
+	rate := time.Second / 3.0
 
 	// This path is disabled for now because unauth'd traffic is allowed the
 	// same RPS as auth'd. The value of the cookie then is to simply allow more
@@ -96,7 +96,7 @@ func NewGRGQL(ctx context.Context, upstream *http.Client, cookie string) (graphq
 		}
 	*/
 
-	return NewBatchedGraphQLClient(string(host), &http.Client{Transport: auth}, rate)
+	return NewBatchedGraphQLClient(string(host), &http.Client{Transport: auth}, rate, 6 /* Confirmed empirically. */)
 }
 
 // GetWork returns a work with all known editions. Due to the way R—— works, if
