@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"iter"
 	"math/rand/v2"
 	"net/http"
@@ -68,6 +69,9 @@ type Controller struct {
 
 	refreshG       errgroup.Group // Limits how many authors/works we sync in the background.
 	refreshWaiting atomic.Int32   // How many refresh requests we have in the queue.
+
+	etagMatches    atomic.Int32 // How many times etags matched during denomalization.
+	etagMismatches atomic.Int32 // How many times etags differed during denormalization.
 }
 
 // getter allows alternative implementations of the core logic to be injected.
@@ -146,9 +150,12 @@ func NewController(cache cache[[]byte], getter getter) (*Controller, error) {
 		ctx := context.Background()
 		for {
 			time.Sleep(1 * time.Minute)
+			etagHits, etagMisses := c.etagMatches.Load(), c.etagMismatches.Load()
 			Log(ctx).Debug("controller stats",
 				"refreshWaiting", c.refreshWaiting.Load(),
 				"denormWaiting", c.denormWaiting.Load(),
+				"etagMatches", etagHits,
+				"etagRatio", float64(etagHits)/(float64(etagHits)+float64(etagMisses)),
 			)
 		}
 	}()
@@ -449,8 +456,12 @@ func (c *Controller) denormalizeEditions(ctx context.Context, workID int64, book
 		Log(ctx).Debug("problem getting work", "err", err)
 		return err
 	}
+
+	old := newETagWriter()
+	r := io.TeeReader(bytes.NewReader(workBytes), old)
+
 	var work workResource
-	err = json.Unmarshal(workBytes, &work)
+	err = json.NewDecoder(r).Decode(&work)
 	if err != nil {
 		Log(ctx).Debug("problem unmarshaling work", "err", err, "workID", workID)
 		_ = c.cache.Expire(ctx, WorkKey(workID))
@@ -504,10 +515,19 @@ func (c *Controller) denormalizeEditions(ctx context.Context, workID int64, book
 
 	buf := _buffers.Get()
 	defer buf.Free()
-	err = json.NewEncoder(buf).Encode(work)
+	neww := newETagWriter()
+	w := io.MultiWriter(buf, neww)
+	err = json.NewEncoder(w).Encode(work)
 	if err != nil {
 		return err
 	}
+
+	if neww.ETag() == old.ETag() {
+		// The work didn't change, so we're done.
+		c.etagMatches.Add(1)
+		return nil
+	}
+	c.etagMismatches.Add(1)
 
 	// We can't persist the shared buffer in the cache so clone it.
 	out := bytes.Clone(buf.Bytes())
@@ -548,16 +568,20 @@ func (c *Controller) denormalizeWorks(ctx context.Context, authorID int64, workI
 		return nil
 	}
 
-	a, err := c.GetAuthor(ctx, authorID)
+	authorBytes, err := c.GetAuthor(ctx, authorID)
 	if errors.Is(err, statusErr(http.StatusTooManyRequests)) {
-		a, err = c.GetAuthor(ctx, authorID) // Reload if we got a cold cache.
+		authorBytes, err = c.GetAuthor(ctx, authorID) // Reload if we got a cold cache.
 	}
 	if err != nil {
 		Log(ctx).Debug("problem loading author for denormalizeWorks", "err", err)
 		return err
 	}
+
+	old := newETagWriter()
+	r := io.TeeReader(bytes.NewReader(authorBytes), old)
+
 	var author AuthorResource
-	err = json.Unmarshal(a, &author)
+	err = json.NewDecoder(r).Decode(&author)
 	if err != nil {
 		Log(ctx).Debug("problem unmarshaling author", "err", err, "authorID", authorID)
 		_ = c.cache.Expire(ctx, AuthorKey(authorID))
@@ -672,10 +696,19 @@ func (c *Controller) denormalizeWorks(ctx context.Context, authorID int64, workI
 
 	buf := _buffers.Get()
 	defer buf.Free()
-	err = json.NewEncoder(buf).Encode(author)
+	neww := newETagWriter()
+	w := io.MultiWriter(buf, neww)
+	err = json.NewEncoder(w).Encode(author)
 	if err != nil {
 		return err
 	}
+
+	if neww.ETag() == old.ETag() {
+		// The author didn't change, so we're done.
+		c.etagMatches.Add(1)
+		return nil
+	}
+	c.etagMismatches.Add(1)
 
 	// We can't persist the shared buffer in the cache so clone it.
 	out := bytes.Clone(buf.Bytes())
